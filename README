@@ -1,0 +1,24 @@
+malloc_stress.sh is a shell script that try to find the shortest way to hurt your malloc implementation.
+
+Exemple :
+
+$ ./malloc_stress.sh ./a_bugged_malloc.so
+Can hurt your malloc in 212 steps, you can Ctrl-C to see it.
+Can hurt your malloc in 177 steps, you can Ctrl-C to see it.
+Can hurt your malloc in 96 steps, you can Ctrl-C to see it.
+Can hurt your malloc in 84 steps, you can Ctrl-C to see it.
+Can hurt your malloc in 58 steps, you can Ctrl-C to see it.
+Can hurt your malloc in 51 steps, you can Ctrl-C to see it.
+Can hurt your malloc in 21 steps, you can Ctrl-C to see it.
+Can hurt your malloc in 17 steps, you can Ctrl-C to see it.
+Can hurt your malloc in 7 steps, you can Ctrl-C to see it.
+^C
+char *pointers[4096];
+pointers[1091] = malloc(582);
+pointers[2922] = malloc(196);
+pointers[624] = malloc(622);
+pointers[3491] = malloc(503);
+pointers[1727] = malloc(63);
+pointers[1623] = malloc(375);
+pointers[1727] = remalloc(448);
+Memory corruption, in your realloc at pointers[1727][63]
