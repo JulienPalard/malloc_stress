@@ -12,13 +12,19 @@ exit 1
 }
 
 [ -z "$1" ] && usage
+LIB_MALLOC="$1"
 
 tail -n 116 $0 > malloc_test.c
 cc malloc_test.c -o malloc_test
 rm -f malloc_test.c
 atexit()
 {
-    LD_PRELOAD="$1" ./malloc_test $SHORTEST_SEED
+    if [ $SHORTEST -ne 999 ]
+    then
+        LD_PRELOAD="$LIB_MALLOC" ./malloc_test $SHORTEST_SEED
+    else
+        echo "Your malloc seems OK for me."
+    fi
     rm -f malloc_test
     exit 0
 }
@@ -29,13 +35,13 @@ SHORTEST_SEED=""
 i=0
 while :
 do
-    result="$(LD_PRELOAD="$1" ./malloc_test $i | head -n 1000)"
+    result="$(LD_PRELOAD="$LIB_MALLOC" ./malloc_test $i | head -n 1000)"
     INSTRUCTIONS="$(printf "%s" "$result" | wc -l)"
     if [ -z "$SHORTEST" ] || [ "$INSTRUCTIONS" -lt "$SHORTEST" ]
     then
         SHORTEST="$INSTRUCTIONS"
         SHORTEST_SEED="$i"
-        echo "Can hurt your malloc in $SHORTEST steps, you can Ctrl-C to see it."
+        [ $SHORTEST -ne 999 ] && echo "Can hurt your malloc in $SHORTEST steps, you can Ctrl-C to see it."
     fi
     i=$((i + 1))
 done
@@ -117,7 +123,7 @@ void stress()
             }
             else
             {
-                str("pointers[");dec(offset);str("] = realloc(");str("pointers[");dec(offset);str("]");dec(size);str(");\n");
+                str("pointers[");dec(offset);str("] = realloc(");str("pointers[");dec(offset);str("], ");dec(size);str(");\n");
                 if (malloked[offset])
                 {
                     pointers[offset] = realloc(pointers[offset], size);
