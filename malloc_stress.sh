@@ -14,9 +14,10 @@ exit 1
 [ -z "$1" ] && usage
 LIB_MALLOC="$1"
 
-tail -n 116 $0 > malloc_test.c
+sed '0,/^Begin of the malloc checker/d' $0 > malloc_test.c
 cc malloc_test.c -o malloc_test
 rm -f malloc_test.c
+
 atexit()
 {
     echo
@@ -47,6 +48,7 @@ do
     i=$((i + 1))
 done
 
+Begin of the malloc checker, in C :
 
 #include <string.h>
 #include <stdio.h>
