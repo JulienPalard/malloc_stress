@@ -13,7 +13,7 @@ exit 1
 
 [ -z "$1" ] && usage
 
-tail -n 115 $0 > malloc_test.c
+tail -n 116 $0 > malloc_test.c
 cc malloc_test.c -o malloc_test
 rm -f malloc_test.c
 atexit()
@@ -48,6 +48,7 @@ done
 
 #define _stringify(a) #a
 #define stringify(a) _stringify(a)
+#define MIN(a,b)     ((a) < (b) ? (a) : (b))
 
 int nbr(int value, char *base)
 {
@@ -99,7 +100,7 @@ void stress()
     while (1)
     {
         offset = rand() % LENGTH;
-        size = rand() %  666;
+        size = rand() % 666;
         if (malloked[offset])
         {
             for (i = 0; i < sizes[offset]; i++)
@@ -116,11 +117,11 @@ void stress()
             }
             else
             {
-                str("pointers[");dec(offset);str("] = remalloc(");dec(size);str(");\n");
+                str("pointers[");dec(offset);str("] = realloc(");str("pointers[");dec(offset);str("]");dec(size);str(");\n");
                 if (malloked[offset])
                 {
                     pointers[offset] = realloc(pointers[offset], size);
-                    for (i = 0; i < size; i++)
+                    for (i = 0; i < MIN(size, sizes[offset]) ; i++)
                         if (pointers[offset][i] != offset % 127)
                         {
                             str("Memory corruption, in your realloc at pointers[");dec(offset);str("][");dec(i);str("]\n");
