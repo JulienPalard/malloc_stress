@@ -19,6 +19,7 @@ cc malloc_test.c -o malloc_test
 rm -f malloc_test.c
 atexit()
 {
+    echo
     if [ $SHORTEST -ne 999 ]
     then
         LD_PRELOAD="$LIB_MALLOC" ./malloc_test $SHORTEST_SEED
@@ -35,7 +36,7 @@ SHORTEST_SEED=""
 i=0
 while :
 do
-    result="$(LD_PRELOAD="$LIB_MALLOC" ./malloc_test $i | head -n 1000)"
+    result="$( (LD_PRELOAD="$LIB_MALLOC" ./malloc_test $i ; true ) 2>/dev/null | head -n 1000)"
     INSTRUCTIONS="$(printf "%s" "$result" | wc -l)"
     if [ -z "$SHORTEST" ] || [ "$INSTRUCTIONS" -lt "$SHORTEST" ]
     then
