@@ -136,6 +136,7 @@ void stress()
                             str("Memory corruption, in your realloc at pointers[");dec(offset);str("][");dec(i);str("]\n");
                             exit(EXIT_FAILURE);
                         }
+                    str("memset(pointers["); dec(offset); str("], "); dec(offset); str(" % 127, "); dec(size); str(");\n");
                     memset(pointers[offset], offset % 127, size);
                     sizes[offset] = size;
                 }
@@ -148,6 +149,7 @@ void stress()
             malloked[offset] = 1;
             sizes[offset] = size;
             memset(pointers[offset], offset % 127, size);
+            str("memset(pointers["); dec(offset); str("], "); dec(offset); str(" % 127, "); dec(size); str(");\n");
         }
     }
 }

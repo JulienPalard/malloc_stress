@@ -22,3 +22,8 @@ pointers[1727] = malloc(63);
 pointers[1623] = malloc(375);
 pointers[1727] = remalloc(448);
 Memory corruption, in your realloc at pointers[1727][63]
+
+
+
+Beware, `./malloc_stress.sh a_bugged_malloc.so` would not look for a
+.so in your current directory, don't forget the `./`.
