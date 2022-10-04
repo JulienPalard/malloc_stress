@@ -105,7 +105,6 @@ void stress()
     int i, offset, size;
 
     memset(malloked, 0, LENGTH * sizeof(int));
-    str("#include <string.h>\n\nint main(){\n");
     str("char *pointers[" LENGTH_AS_STRING "];\n");
     while (1)
     {
