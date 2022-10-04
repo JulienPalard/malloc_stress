@@ -43,7 +43,7 @@ do
     then
         SHORTEST="$INSTRUCTIONS"
         SHORTEST_SEED="$i"
-        [ $SHORTEST -ne 999 ] && echo "Can hurt your malloc in $SHORTEST steps, you can Ctrl-C to see it."
+        [ $SHORTEST -ne 999 ] && echo "Can hurt your malloc in $SHORTEST steps (using seed $i), you can Ctrl-C to see it."
     fi
     i=$((i + 1))
 done
@@ -105,6 +105,7 @@ void stress()
     int i, offset, size;
 
     memset(malloked, 0, LENGTH * sizeof(int));
+    str("#include <string.h>\n\nint main(){\n");
     str("char *pointers[" LENGTH_AS_STRING "];\n");
     while (1)
     {
@@ -127,19 +128,26 @@ void stress()
             else
             {
                 str("pointers[");dec(offset);str("] = realloc(");str("pointers[");dec(offset);str("], ");dec(size);str(");\n");
-                if (malloked[offset])
-                {
-                    pointers[offset] = realloc(pointers[offset], size);
-                    for (i = 0; i < MIN(size, sizes[offset]) ; i++)
-                        if (pointers[offset][i] != offset % 127)
-                        {
-                            str("Memory corruption, in your realloc at pointers[");dec(offset);str("][");dec(i);str("]\n");
-                            exit(EXIT_FAILURE);
-                        }
-                    str("memset(pointers["); dec(offset); str("], "); dec(offset); str(" % 127, "); dec(size); str(");\n");
-                    memset(pointers[offset], offset % 127, size);
-                    sizes[offset] = size;
+                pointers[offset] = realloc(pointers[offset], size);
+                if (pointers[offset] == 0) {
+                    str("// realloc returned NULL!!!!\n");
+                    exit(EXIT_FAILURE);
                 }
+                str("// realloc done, will check if memory has been copied...\n");
+                for (i = 0; i < MIN(size, sizes[offset]) ; i++)
+                {
+                    str("if (pointers[");dec(offset);str("][");dec(i); str("] != ");dec(offset); str(" % 127) {\n");
+                    str("    write(1, \"Memory corruption\\n\", 18);\n");
+                    str("}");
+                    if (pointers[offset][i] != offset % 127)
+                    {
+                        str("Memory corruption, in your realloc at pointers[");dec(offset);str("][");dec(i);str("]\n");
+                        exit(EXIT_FAILURE);
+                    }
+                }
+                str("memset(pointers["); dec(offset); str("], "); dec(offset); str(" % 127, "); dec(size); str(");\n");
+                memset(pointers[offset], offset % 127, size);
+                sizes[offset] = size;
             }
         }
         else
